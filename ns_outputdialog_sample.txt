@@ -1,0 +1,44 @@
+
+/*
+To call and display the output dialog in your UI, you need to add these lines below inside your Client script
+
+--- FOR ASYNCHRONOUS PROCESS ---
+return new Promise((resolve, reject) => {
+    nsOutputDialog.create({
+        title: 'Saving...',
+        suiteletScriptId: 'customscriptid',
+        suiteletDeploymentId: 'customdeploymentid',
+        closable: false,
+        otherparams: {
+            param1: param1,
+            param2: projectId,
+        }
+    }).then((result) => {
+        resolve(true);
+    }).catch((error) => {
+        alert(error);
+        reject(false);
+    });
+});
+
+
+
+--- FOR SYNCHRONOUS PROCESS ---
+nsOutputDialog.create({
+    title: 'Processing...',
+    suiteletScriptId: 'customscriptid',
+    suiteletDeploymentId: 'customdeploymentid',
+    otherparams: {
+        param1: param1,
+        param2: projectId,
+    }
+});
+
+Then add these lines below inside your Suitelet for the updating of progress percentage.
+
+if (mrTaskId) {
+    let statusCheckObj = nsOutputDialog.statusCheck(task, mrTaskId, scriptObj.id, scriptObj.deploymentId);
+    log.debug(tLog + 'statusCheckObj', statusCheckObj);
+    response.writeLine(JSON.stringify(statusCheckObj));
+}
+*/
