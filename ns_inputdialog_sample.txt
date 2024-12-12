@@ -1,0 +1,46 @@
+
+/*
+To call and display the input dialog in your UI, you need to add these lines below inside your Client script
+
+let options = {
+    title: headerTitle,
+    message: '',
+    buttons: [
+        {
+            label: 'OK',
+            value: 1
+        },
+        {
+            label: 'Cancel',
+            value: 2
+        }
+    ],
+    fields: [
+        {
+            type: 'select',
+            isMandatory: false,
+            isMultiple: true,
+            returnText: true,
+            height: '300px',
+            caption: 'Select',
+            fieldId: 'custpage_refselect',
+            actionButtons: [1],
+            options: refOptions,
+        }
+    ]
+};
+
+let failure = function (reason) {
+    console.log('Failure: ' + reason);
+}
+
+let success = function (result, value) {
+    console.log('Input dialog closed by clicking button ' + result + ' | value: ' + value);
+    if (result == 1) {
+        // DO SOMETHING
+    }
+}
+
+nsInputDialog.create(options, success, failure);
+
+*/
