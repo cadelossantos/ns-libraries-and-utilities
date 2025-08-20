@@ -17,6 +17,10 @@
  *
  * v1.0.3   2024-09-30
  * added non-closable option and catching of status if failed.
+ * 
+ * v1.0.4   2025-08-20
+ * added enhancements to progress loader
+ *      added header content type to https.requestSuitelet to not include the body in urlparams when request is sent to the Suitelet
  */
 
 define(['N/error', 'N/https'],
@@ -112,10 +116,11 @@ define(['N/error', 'N/https'],
                         let res = https.requestSuitelet({
                             scriptId: options.suiteletScriptId,
                             deploymentId: options.suiteletDeploymentId,
-                            body: {
-                                otherparams: JSON.stringify(options.otherparams),
+                            body: JSON.stringify({
+                                otherparams: options.otherparams,
                                 mrTaskId: options.mrTaskId
-                            },
+                            }),
+                            headers: { 'Content-Type': 'application/json' },
                             method: 'POST'
                         });
 
@@ -196,41 +201,66 @@ define(['N/error', 'N/https'],
              */
             function _buildBody(){
                 // _options.percentage = 50;
-                let output = '';
-                output +=  '<html lang="en">';
-                output +=       '<head>';
-                output +=           '<meta charset="utf-8">';
-                // html +=          '<meta name="viewport" content="width=device-width, initial-scale=1">';
-                output +=          '<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">';
-                output +=           '<style type="text/css">';
-                // output +=                '.uir-message-buttons{margin-top: 15px;}';
-                output +=              '.progress.active .progress-bar {-webkit-transition: none !important;transition: none !important;}';
-                output +=              '.center {margin-left: auto; margin-right: auto;}'
-                output +=           '</style>';
-                output +=       '</head>';
-                output +=       '<body>';
-                output +=           '<div style="height: 55px;">';
-                // output +=            '<br/><br/><br/><br/>';
-                // output +=            '<div class = "center" style = "display: table; width: 50%;">';
-                // output +=                '<h1 style = "font-size: 18px; text-align: center; font-weight: bold; color: #4D5F79;">' + _options.title + '</h1></br>';
-                // output +=            '</div>';
-                output +=               '<div class="center" style="display: table; width: 100%;">';
-                output +=                       '<span id="nsoutput_status" style="float:left; font-size: 12px;">Status: <b>' + _options.status + '</b></span>';
-                output +=                       '<span id="nsoutput_stage" style="float:right; font-size: 12px;">Stage: <b>' + _options.stage + '</b></span>';
-                output +=                   '</div>';
-                output +=                   '<div class="center" style="display: table; width: 100%;">';
-                output +=                       '<span id="nsoutput_percentage" style="float:left; font-size: 12px;">' + _options.percentage +'%</span>';
-                output +=                       '<span id="nsoutput_count" style="float:right; font-size: 12px;">' + _options.processedCount + ' of ' + _options.totalCount + '</span>';
-                output +=                   '</div>';
-                output +=               '<div style="display: table; width: 100%;" class="center progress-container">';
-                output +=                   '<div class="progress progress-striped active" style = "margin-bottom: 0 !important;">';
-                output +=                       '<div id="nsoutput_progressbar" class="progress-bar progress-bar-info" style = "width: ' + _options.percentage + '%;">';
-                output +=                       '</div>';
-                output +=                   '</div>';
-                output +=               '</div>';
-                output +=           '</div>';
-                output +=       '</body>';
-                output +=   '</html>';
+
+                let output = `<html lang="en">
+                                <head>
+                                    <meta charset="utf-8">
+                                    <!-- <meta name="viewport" content="width=device-width, initial-scale=1"> -->
+                                    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+                                    <style type="text/css">
+                                    /* .uir-message-buttons{margin-top: 15px;} */
+                                    .progress.active .progress-bar {
+                                        -webkit-transition: none !important;
+                                        transition: none !important;
+                                    }
+                                    .center {
+                                        margin-left: auto;
+                                        margin-right: auto;
+                                    }
+                                    /* Custom gradient active progress bar */
+                                    #nsoutput_progressbar {
+                                        background: linear-gradient(
+                                            270deg,
+                                            #0f8cf9ff 25%,
+                                            #8ef3f8ff 50%,
+                                            #0f8cf9ff 75%
+                                        );
+                                        background-size: 200% 100%;
+                                        animation: gradientSlide 3s linear infinite;
+                                    }
+
+                                    @keyframes gradientSlide {
+                                        0%   { background-position: 100% 50%; }
+                                        100% { background-position: 0% 50%; }
+                                    }
+                                    </style>
+                                </head>
+                                <body>
+                                    <div style="height: 55px;">
+                                    <!-- <br/><br/><br/><br/> -->
+                                    
+                                    <!--<div class="center" style="display: table; width: 50%;">
+                                        <h1 style="font-size: 18px; text-align: center; font-weight: bold; color: #4D5F79;"> ${_options.title}</h1></br>
+                                    </div>-->
+                                    
+                                    <div class="center" style="display: table; width: 100%;">
+                                        <span id="nsoutput_status" style="float:left; font-size: 12px;">Status: <b>${_options.status}</b></span>
+                                        <span id="nsoutput_stage" style="float:right; font-size: 12px;">Stage: <b>${_options.stage}</b></span>
+                                    </div>
+                                    <div class="center" style="display: table; width: 100%;">
+                                        <span id="nsoutput_percentage" style="float:left; font-size: 12px;">${_options.percentage}%</span>
+                                        <span id="nsoutput_count" style="float:right; font-size: 12px;">${_options.processedCount} of ${_options.totalCount}</span>
+                                    </div>
+                                    <div style="display: table; width: 100%;" class="center progress-container">
+                                        <div class="progress progress-striped active" style="margin-bottom: 0 !important;">
+                                            <div id="nsoutput_progressbar" class="progress-bar progress-bar-info"
+                                                style="width: ${_options.percentage}%;">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    </div>
+                                </body>
+                                </html>`;
 
                 return output;
             }

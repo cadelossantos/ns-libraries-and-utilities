@@ -34,7 +34,13 @@ nsOutputDialog.create({
     }
 });
 
-Then add these lines below inside your Suitelet for the updating of progress percentage.
+**Then add these lines inside your Suitelet for the updating of progress percentage.
+On your POST method, add this to get the JSON body:
+
+let body = JSON.parse(request.body);
+
+then access body.mrTaskId and body.otherparams.
+and at the end of your POST method, add these lines
 
 if (mrTaskId) {
     let statusCheckObj = nsOutputDialog.statusCheck(task, mrTaskId, scriptObj.id, scriptObj.deploymentId);
